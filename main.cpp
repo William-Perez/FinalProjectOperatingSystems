@@ -3,21 +3,7 @@
 
 using namespace std;
 
-void Disk::InitializeArray(int requestAmount, int numberOfTracks)
-{
-	int number;
-	cout << "Enter requested track(s):\n";
-	for (int i = 0; i < amount;i++)
-	{
-		cin >> number;
-		if (number >= 0 && number < trackamount)
-			*requests[i] = number;
-		else
-			cout << "Error: invalid input\n";
-	}
-}
-
-void FIFO(int *q, int start, int amount, int trackamount)
+/*void FIFO(int *q, int start, int amount, int trackamount)
 {
 	cout << "Request | Tracks Traveled\n";
 	cout << q[0]<<" | "<< q[0] - start<<endl;
@@ -31,7 +17,7 @@ void SSTF(int *q, int start)
 {
 	//int tracks[];
 
-}
+}*/
 
 
 int main()
