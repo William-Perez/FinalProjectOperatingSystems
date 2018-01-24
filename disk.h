@@ -1,4 +1,8 @@
 #include <iostream>
+#include <iomanip>
+#include <string>
+#include <sstream>
+#include "TextTable.h"
 using namespace std;
 #ifndef DISK
 #define DISK
@@ -10,18 +14,24 @@ private:
     int amountOfRequests; // total amount of request
     int *requests; // pointer to array of the request
     int *tracksTraversedBetween; // tracks traversed between request
-    int direction; // direction of the head
+    bool direction; // direction of the head if true then head is up if false head is down
+    int averageSeekTime;
 public:
+    Disk();
     Disk(int size);
-    void printTable(); // prints table like in the book
-    void addRequests();
+    void setData(Disk& disk);
+    void printTable(string algorithmName); // prints table like in the book
+    void addRequests(int requestAmount, int numberOfTracks);
+    string convert_toString(int i);
     ~Disk();
 };
 
+Disk::Disk(){ }
+
 Disk::Disk(int size)
 {
-    requests = int new [size];
-    tracksTraversedBetween = int new [size];
+    requests = new int [size];
+    tracksTraversedBetween = new int [size];
 }
 
 Disk::~Disk()
@@ -34,14 +44,115 @@ void Disk::addRequests(int requestAmount, int numberOfTracks)
 {
 	int number;
 	cout << "Enter requested track(s):\n";
-	for (int i = 0; i < amount;i++)
+	for (int i = 0; i < requestAmount;)
 	{
 		cin >> number;
-		if (number >= 0 && number < trackamount)
+		if (number >= 0 && number < numberOfTracks)
+        {
 			requests[i] = number;
-		else
-			cout << "Error: invalid input\n";
+			i++;
+        }
+		else if(number < 0)
+			cout << "Error invalid input! Keep adding positive integers.\n";
+        else
+            cout << "Cannot request a track that doesn't exist!\n";
 	}
+}
+
+void Disk::setData(Disk& disk)
+{
+    int trackNum; // number of total tracks
+    int headPosition; // position of the track number
+    int requestNum; // number of request that will be input
+    int headMovement; // selection of which way the head will move
+    bool upwards;
+
+    do{
+        cout << "How many tracks are on the disk? ";
+        cin >> trackNum;
+        if(trackNum <= 0)
+            cout << "Please use a positive non-zero integer for the amount of tracks. Try Again!\n";
+    }while(trackNum <= 0);
+    cout << endl;
+
+    do{
+        cout << "Enter the location of the head: ";
+        cin >> headPosition;
+        if(headPosition < 0)
+            cout << "Please use a non-negative integer for the head position. Try Again!\n";
+        else if(headPosition >= trackNum)
+            cout << "The position you are looking for does not exist in the disk. Try Again!\n";
+    }while(headPosition < 0 && headPosition >= trackNum);
+    cout << endl;
+
+    do{
+        cout << "Enter the amount of request that will be run: ";
+        cin >> requestNum;
+        if(requestNum <= 0)
+            cout << "Please a positive non-zero integer for the amount of request you will inputing. Try Again!\n";
+    }while(requestNum <= 0);
+    cout << endl;
+    requests = new int[requestNum];
+    addRequests(requestNum, trackNum);
+
+    do{
+        cout << "In which direction is the head moving? Upwards or Downwards?\n";
+        cout << "1.Upwards\n";
+        cout << "2.Downwards\n";
+        cout << "Enter: ";
+        cin >> headMovement;
+
+        if(headMovement == 1)
+            upwards = true;
+        else if(headMovement == 2)
+            upwards = false;
+        else
+            cout << "Invalid Input! Try Again!\n";
+    }while(headMovement!= 1 && headMovement != 2);
+    cout << endl;
+
+    numberOfTracks = trackNum;
+    headStart = headPosition;
+    amountOfRequests = requestNum;
+    direction = upwards;
+    tracksTraversedBetween = new int [requestNum];
+
+    for(int i = 0; i < requestNum; i++)
+    {
+        tracksTraversedBetween[i] = i;
+    }
+}
+
+void Disk::printTable(string algorithmName)
+{
+    stringstream track, travel;
+    TextTable t('-', '|', '+');
+    cout << setw(23) << algorithmName << endl;
+    t.add("Next Track Accessed");
+    t.add("Number of Tracks Traversed");
+    t.endOfRow();
+
+    for(int i = 0; i < amountOfRequests; i++)
+    {
+        t.add(convert_toString(requests[i]));
+        t.add(convert_toString(tracksTraversedBetween[i]));
+        t.endOfRow();
+    }
+    t.setAlignment( 2, TextTable::Alignment::RIGHT );
+    cout << t;
+    cout << endl;
+    cout << "Average Seek Time: " << averageSeekTime << endl;
+    cout << "Press Enter to Continue!\n";
+    cin.get();
+    cin.get();
+    cout << endl;
+}
+
+string Disk::convert_toString(int i)
+{
+    stringstream ss;
+    ss << i;
+    return ss.str();
 }
 
 #endif // DISK
