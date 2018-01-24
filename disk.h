@@ -29,7 +29,7 @@ public:
 	void CSCAN();
 	void LOOK();
 	void CLOOK();
-	void Disk::calculateTracksTraversed();
+	void Disk::calculateTracksTraversed(bool scan);
     string convert_toString(int i);
     void calculateSeekTime();
     ~Disk();
@@ -364,7 +364,7 @@ int numgen(int trackamount)
 	return random_integer;
 }
 
-void Disk::calculateTracksTraversed()
+void Disk::calculateTracksTraversed(bool scan)
 {
 	for (int i = 0; i < amountOfRequests; i++)
 	{
@@ -375,9 +375,27 @@ void Disk::calculateTracksTraversed()
 		else
 		{
 			tracksTraversedBetween[i] = abs(requests[i - 1] - requests[i]);
+			if (scan)
+			{
+				if (direction)
+				{
+					if (requests[i - 1] > requests[i])
+					{
+						tracksTraversedBetween[i] += (2 * (headStart - requests[i - 1]));
+					}
+				}
+				else
+				{
+					if (requests[i - 1] < requests[i])
+					{
+						tracksTraversedBetween[i] += (2 * (headStart - requests[i - 1]));
+					}
+				}
+			}
 		}
 	}
 }
+
 #endif // DISK
 
 
