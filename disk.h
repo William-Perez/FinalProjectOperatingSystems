@@ -17,6 +17,7 @@ private:
     bool direction; // direction of the head if true then head is up if false head is down
     int averageSeekTime;
 	int *queue; //Ordered list
+	bool scan = false;
 public:
     Disk();
     Disk(int size);
@@ -47,6 +48,7 @@ Disk::~Disk()
 {
     delete[] requests;
     delete[] tracksTraversedBetween;
+	delete [] queue;
 }
 
 void Disk::addRequests(int requestAmount, int numberOfTracks)
@@ -213,19 +215,141 @@ void Disk::SSTF()
 
 void Disk::SCAN()
 {
-	LOOK();
-
+	delete [] queue;
+	queue = new int[amountOfRequests];
+	for (int i = 0; i < amountOfRequests; i++)
+	{
+		queue[i] = requests[i];
+	}
+	int temp;
+	for (int i = 0;i<amountOfRequests;i++)
+	{
+		for (int j = 0;j<amountOfRequests;j++)
+		{
+			if (queue[i] > queue[j])
+			{
+				temp = queue[i];
+				queue[i] = queue[j];
+				queue[j] = temp;
+			}
+		}
+	}
+	for (int i = 0; queue[i] > headStart;i++)
+	{
+		for (int j = 0; j<amountOfRequests;j++)
+		{
+			if (queue[i] < queue[j])
+			{
+				temp = queue[i];
+				queue[i] = queue[j];
+				queue[j] = temp;
+			}
+		}
+	}
+	if (!direction)
+	{
+		for (; queue[0] > headStart;)
+		{
+			temp = queue[0];
+			for (int i = 0; i < amountOfRequests - 1; i++)
+			{
+				queue[i] = queue[i + 1];
+			}
+			queue[amountOfRequests - 1] = temp;
+		}
+	}
+	for (int i = 0; i < amountOfRequests; i++)
+	{
+		cout << queue[i] << endl;
+	}
 }
 
 void Disk::CSCAN()
 {
-	CLOOK();
+	delete [] queue;
+	queue = new int[amountOfRequests];
+	for (int i = 0; i < amountOfRequests; i++)
+	{
+		queue[i] = requests[i];
+	}
+	int temp;
+	for (int i = 0;i<amountOfRequests;i++)
+	{
+		for (int j = 0;j<amountOfRequests;j++)
+		{
+			if (queue[i] > queue[j])
+			{
+				temp = queue[i];
+				queue[i] = queue[j];
+				queue[j] = temp;
+			}
+		}
+	}
+	for (int i = 0; queue[i] > headStart;i++)
+	{
+		for (int j = 0; j<amountOfRequests;j++)
+		{
+			if (queue[i] < queue[j])
+			{
+				temp = queue[i];
+				queue[i] = queue[j];
+				queue[j] = temp;
+			}
+		}
+	}
+	for (int i = 0;i<amountOfRequests;i++)
+	{
+		for (int j = 0;j<amountOfRequests;j++)
+		{
+			if (queue[i] < queue[j] && queue[j] < headStart)
+			{
+				temp = queue[i];
+				queue[i] = queue[j];
+				queue[j] = temp;
+			}
+		}
+	}
+	if (!direction)
+	{
+		if (amountOfRequests % 2)
+		{
+			for (int i = 0; i != (amountOfRequests / 2);i++)
+			{
+				temp = queue[i];
+				queue[i] = queue[amountOfRequests - (1 + i)];
+				queue[amountOfRequests - (1 + i)] = temp;
+				temp = i;
+			}
+			int i = temp + 1;
+			temp = queue[i];
+			queue[i] = queue[amountOfRequests - (1 + i)];
+			queue[amountOfRequests - (1 + i)] = temp;
+		}
+		else
+		{
+			for (int i = 0; (queue[i + 1] != queue[amountOfRequests - (1 + i)]);i++)
+			{
+				temp = queue[i];
+				queue[i] = queue[amountOfRequests - (1 + i)];
+				queue[amountOfRequests - (1 + i)] = temp;
+				temp = i;
+			}
+			int i = temp + 1;
+			temp = queue[i];
+			queue[i] = queue[amountOfRequests - (1 + i)];
+			queue[amountOfRequests - (1 + i)] = temp;
+		}
+	}
+	for (int i = 0; i < amountOfRequests; i++)
+	{
+		cout << queue[i] << endl;
+	}
 
 }
 
 void Disk::CLOOK()
 {
-	int *queue;
+	delete [] queue;
 	queue = new int[amountOfRequests];
 	for (int i = 0; i < amountOfRequests; i++)
 	{
@@ -307,7 +431,7 @@ void Disk::CLOOK()
 
 void Disk::LOOK()
 {
-	int *queue;
+	delete [] queue;
 	queue = new int[amountOfRequests];
 	for (int i = 0; i < amountOfRequests; i++)
 	{
