@@ -16,12 +16,20 @@ private:
     int *tracksTraversedBetween; // tracks traversed between request
     bool direction; // direction of the head if true then head is up if false head is down
     int averageSeekTime;
+	int *queue; //Ordered list
 public:
     Disk();
     Disk(int size);
     void setData(Disk& disk);
     void printTable(string algorithmName); // prints table like in the book
     void addRequests(int requestAmount, int numberOfTracks);
+	int* InitializeArray();
+	void SSTF();
+	void SCAN();
+	void CSCAN();
+	void LOOK();
+	void CLOOK();
+	void Disk::calculateTracksTraversed();
     string convert_toString(int i);
     void calculateSeekTime();
     ~Disk();
@@ -164,5 +172,214 @@ void Disk::calculateSeekTime()
     avg /= amountOfRequests;
     averageSeekTime = avg;
 }
+
+void Disk::SSTF()
+{
+	int current = headStart, temp;
+	bool *used;
+	
+	queue = new int[amountOfRequests];
+	used = new bool[amountOfRequests];
+	for (int i = 0; i < amountOfRequests; i++)
+		used[i] = false;
+
+	for (int j = 0; j < amountOfRequests; j++)
+	{
+		int seektime = 1000000;
+		for (int i = 0; i < amountOfRequests;i++)
+		{
+
+			if ((abs(requests[i] - current) < seektime) && !(used[i]))
+			{
+				temp = i;
+				seektime = abs(requests[i] - current);
+
+			}
+			if (i == amountOfRequests - 1)
+			{
+				queue[j] = temp;
+				used[temp] = true;
+			}
+		}
+		current = requests[queue[j]];
+
+	}
+	/*cout << requests[queue[0]] << " | " << abs(headStart - requests[queue[0]]) << endl;
+	for (int i = 1; i < amountOfRequests;i++)
+	{
+		cout << requests[queue[i]] << " | " << abs(requests[queue[i - 1]] - requests[queue[i]]) << endl;
+	}*/
+}
+
+void Disk::SCAN()
+{
+	LOOK();
+
+}
+
+void Disk::CSCAN()
+{
+	CLOOK();
+
+}
+
+void Disk::CLOOK()
+{
+	int *queue;
+	queue = new int[amountOfRequests];
+	for (int i = 0; i < amountOfRequests; i++)
+	{
+		queue[i] = requests[i];
+	}
+	int temp;
+	for (int i = 0;i<amountOfRequests;i++)
+	{
+		for (int j = 0;j<amountOfRequests;j++)
+		{
+			if (queue[i] > queue[j])
+			{
+				temp = queue[i];
+				queue[i] = queue[j];
+				queue[j] = temp;
+			}
+		}
+	}
+	for (int i = 0; queue[i] > headStart;i++)
+	{
+		for (int j = 0; j<amountOfRequests;j++)
+		{
+			if (queue[i] < queue[j])
+			{
+				temp = queue[i];
+				queue[i] = queue[j];
+				queue[j] = temp;
+			}
+		}
+	}
+	for (int i = 0;i<amountOfRequests;i++)
+	{
+		for (int j = 0;j<amountOfRequests;j++)
+		{
+			if (queue[i] < queue[j] && queue[j] < headStart)
+			{
+				temp = queue[i];
+				queue[i] = queue[j];
+				queue[j] = temp;
+			}
+		}
+	}
+	if (!direction)
+	{
+		if (amountOfRequests % 2)
+		{
+			for (int i = 0; i != (amountOfRequests / 2);i++)
+			{
+				temp = queue[i];
+				queue[i] = queue[amountOfRequests - (1 + i)];
+				queue[amountOfRequests - (1 + i)] = temp;
+				temp = i;
+			}
+			int i = temp + 1;
+			temp = queue[i];
+			queue[i] = queue[amountOfRequests - (1 + i)];
+			queue[amountOfRequests - (1 + i)] = temp;
+		}
+		else
+		{
+			for (int i = 0; (queue[i + 1] != queue[amountOfRequests - (1 + i)]);i++)
+			{
+				temp = queue[i];
+				queue[i] = queue[amountOfRequests - (1 + i)];
+				queue[amountOfRequests - (1 + i)] = temp;
+				temp = i;
+			}
+			int i = temp + 1;
+			temp = queue[i];
+			queue[i] = queue[amountOfRequests - (1 + i)];
+			queue[amountOfRequests - (1 + i)] = temp;
+		}
+	}
+	for (int i = 0; i < amountOfRequests; i++)
+	{
+		cout << queue[i] << endl;
+	}
+}
+
+void Disk::LOOK()
+{
+	int *queue;
+	queue = new int[amountOfRequests];
+	for (int i = 0; i < amountOfRequests; i++)
+	{
+		queue[i] = requests[i];
+	}
+	int temp;
+	for (int i = 0;i<amountOfRequests;i++)
+	{
+		for (int j = 0;j<amountOfRequests;j++)
+		{
+			if (queue[i] > queue[j])
+			{
+				temp = queue[i];
+				queue[i] = queue[j];
+				queue[j] = temp;
+			}
+		}
+	}
+	for (int i = 0; queue[i] > headStart;i++)
+	{
+		for (int j = 0; j<amountOfRequests;j++)
+		{
+			if (queue[i] < queue[j])
+			{
+				temp = queue[i];
+				queue[i] = queue[j];
+				queue[j] = temp;
+			}
+		}
+	}
+	if (!direction)
+	{
+		for (; queue[0] > headStart;)
+		{
+			temp = queue[0];
+			for (int i = 0; i < amountOfRequests - 1; i++)
+			{
+				queue[i] = queue[i + 1];
+			}
+			queue[amountOfRequests - 1] = temp;
+		}
+	}
+	for (int i = 0; i < amountOfRequests; i++)
+	{
+		cout << queue[i] << endl;
+	}
+}
+
+int numgen(int trackamount)
+{
+	int random_integer;
+	random_integer = (rand() % trackamount) + 1;
+	//cout << random_integer << endl;
+	return random_integer;
+}
+
+void Disk::calculateTracksTraversed()
+{
+	for (int i = 0; i < amountOfRequests; i++)
+	{
+		if (i == 0)
+		{
+			tracksTraversedBetween[0] = abs(headStart - requests[0]);
+		}
+		else
+		{
+			tracksTraversedBetween[i] = abs(requests[i - 1] - requests[i]);
+		}
+	}
+}
+#endif // DISK
+
+
 
 #endif // DISK
