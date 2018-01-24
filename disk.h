@@ -23,6 +23,7 @@ public:
     void printTable(string algorithmName); // prints table like in the book
     void addRequests(int requestAmount, int numberOfTracks);
     string convert_toString(int i);
+    void calculateSeekTime();
     ~Disk();
 };
 
@@ -119,7 +120,7 @@ void Disk::setData(Disk& disk)
 
     for(int i = 0; i < requestNum; i++)
     {
-        tracksTraversedBetween[i] = i;
+        tracksTraversedBetween[i] = 5;
     }
 }
 
@@ -141,6 +142,7 @@ void Disk::printTable(string algorithmName)
     t.setAlignment( 2, TextTable::Alignment::RIGHT );
     cout << t;
     cout << endl;
+    calculateSeekTime();
     cout << "Average Seek Time: " << averageSeekTime << endl;
     cout << "Press Enter to Continue!\n";
     cin.get();
@@ -155,5 +157,17 @@ string Disk::convert_toString(int i)
     return ss.str();
 }
 
-#endif // DISK
+void Disk::calculateSeekTime()
+{
+    int avg = 0;
 
+    for(int i = 0; i < amountOfRequests; i++)
+    {
+        avg += tracksTraversedBetween[i];
+    }
+
+    avg /= amountOfRequests;
+    averageSeekTime = avg;
+}
+
+#endif // DISK
