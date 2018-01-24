@@ -1,5 +1,6 @@
 #include <iostream>
 #include <cmath>
+#include "disk.h"
 
 using namespace std;
 
@@ -17,20 +18,15 @@ void SSTF(int *q, int start)
 {
 	//int tracks[];
 
-}*/
+}
+*/
 
 
 int main()
 {
-	int start, trackamount, amount, *q;
-	cout << "Enter number of tracks\n";
-	cin >> trackamount;
-	cout << "Enter starting track\n";
-	cin >> start;
-	cout << "Enter amount of requests\n";
-	cin >> amount;
-	q = InitializeArray(amount, trackamount);
-	FIFO(q, start, amount, trackamount);
-	system("pause");
+    Disk userDisk;
+	userDisk.setData(userDisk);
+	userDisk.printTable("FIFO");
+
 	return 0;
 }
