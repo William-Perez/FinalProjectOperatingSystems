@@ -2,6 +2,8 @@
 #include <iomanip>
 #include <string>
 #include <sstream>
+#include <ctime>
+#include <cstdlib>
 #include "TextTable.h"
 using namespace std;
 #ifndef DISK
