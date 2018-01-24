@@ -117,11 +117,6 @@ void Disk::setData(Disk& disk)
     amountOfRequests = requestNum;
     direction = upwards;
     tracksTraversedBetween = new int [requestNum];
-
-    for(int i = 0; i < requestNum; i++)
-    {
-        tracksTraversedBetween[i] = 5;
-    }
 }
 
 void Disk::printTable(string algorithmName)
